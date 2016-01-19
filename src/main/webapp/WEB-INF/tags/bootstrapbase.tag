@@ -1,7 +1,6 @@
 <%@tag description="Overall Page template" pageEncoding="UTF-8"%>
 <%@attribute name="highlight" required="true" %>
 <%@attribute name="title" required="true" %>
-<%@attribute name="clean" required="false" type="java.lang.Boolean"%>
 <%@attribute name="scripting" required="false" %>
 <%@attribute name="fluid" required="false" %>
 <%@attribute name="footer" required="false" %>
@@ -27,7 +26,7 @@
 
         <title>${title}</title>
         <link href="${pageContext.request.contextPath}/static/css/bootstrap.min.css" rel="stylesheet">
-        <link href="${pageContext.request.contextPath}/static/css/platform.css" rel="stylesheet">
+        <link href="${pageContext.request.contextPath}/static/css/app.css" rel="stylesheet">
 
     </head>
 
@@ -38,35 +37,17 @@
                 <div class="navbar navbar-inverse navbar-fixed-top" id="top-navbar">
                     <div class="container">
                         <div class="navbar-header">
-                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                            <a class="navbar-brand" href="${pageContext.request.contextPath}/platform">SESYNC Integrated Platform</a>
+                            <a class="pull-left" href="http://www.sesync.org">
+                                <img style="display: inline-block;max-height: 50px;"src="http://www.sesync.org/sites/all/themes/sesync/logo.png" alt="SESYNC">
+                            </a>
+                            <p style="padding-left: 50px;" class="navbar-brand">${title}</p>
                         </div>
-                        <!--
-                        <ul class="nav navbar-nav">
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">People and Projects<b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="${pageContext.request.contextPath}/auth/contact.jsp">Manage Contacts</a></li>
-                                </ul>
-                            </li>
-                        </ul>-->
-                        <!--<div class="navbar-collapse collapse">
-                        <ul class="navbar-form navbar-right">
-                            <li><button class="btn btn-default btn-success">
-                                    <span class="glyphicon glyphicon-shopping-cart"></span>
-                                    <span style="margin-top:-3px; color: black;" class="small">5</span>
-                                </button></li>
-                        </ul>
-                        </div> -->
+                       
                     </div>
                 </div>
             </c:if>
 
-            <div class="${container} platform-main-content">
+            <div class="${container} app-main-content">
                 <c:if test="${!hidebreadcrumbs}">
                     <ol class="breadcrumb">
                         <li><a href="${pageContext.request.contextPath}/platform">Home</a></li>
@@ -78,22 +59,7 @@
             </div><!-- /.container -->
         </div>
                 ${footer}
-        <c:if test="${!clean}">
-
-            <div id="footer">
-                <div class="container">
-                    <p class="text-muted credit">Integrated Discovery Platform, SESYNC, University of Maryland &copy; 2015
-                        <c:choose>
-                            <c:when test="${pageContext.request.userPrincipal == null}">
-                                <a href="${pageContext.request.contextPath}/auth/redirect.jsp?redirect=${pageContext.request.contextPath}">Login</a>
-                            </c:when>
-                            <c:otherwise>
-                                Currently logged in as ${pageContext.request.userPrincipal.name}. <a href="${pageContext.request.contextPath}/resources/logout">Logout</a>
-                            </c:otherwise>
-                        </c:choose></p>
-                </div>
-            </div>
-        </c:if>
+        
 
         <!-- Bootstrap core JavaScript
         ================================================== -->

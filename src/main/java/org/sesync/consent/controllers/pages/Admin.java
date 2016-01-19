@@ -15,6 +15,9 @@
  */
 package org.sesync.consent.controllers.pages;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import org.sesync.consent.model.InstanceFactory;
 import org.sesync.consent.model.InstanceModel;
 import org.slf4j.Logger;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Root controller to return /
@@ -33,15 +37,37 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 public class Admin {
+    
     private static final Logger LOG = LoggerFactory.getLogger(Admin.class);
-
+    
     @Autowired
     private InstanceFactory instanceFactory;
     
-    @RequestMapping(value="/{instance}/admin", method = RequestMethod.GET)
-    public String adminGet(@PathVariable("instance") String instance) {
-        InstanceModel im = instanceFactory.getInstance(instance);
+    private ModelAndView getModel(InstanceModel im) {
         
-        return "admin";
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("admin");
+        mav.addObject("im", im);
+        return mav;
     }
+    
+    @RequestMapping(value = "/{instance}/admin", method = RequestMethod.GET)
+    public ModelAndView adminGet(@PathVariable("instance") String instance) {
+        InstanceModel im = instanceFactory.getInstance(instance);
+        return getModel(im);
+    }
+    
+    @RequestMapping(value = "/{instance}/admin", method = RequestMethod.POST)
+    public ModelAndView sendMail(@PathVariable("instance") String instance, @RequestParam("code") String[] codeList) {
+        InstanceModel im = instanceFactory.getInstance(instance);
+        Set<String> codes = new HashSet<>();
+        codes.addAll(Arrays.asList(codeList));
+        for (String code : codes) {
+            LOG.info("Sending to: " + code);
+            im.sendMailTo(code);
+        }
+        
+        return getModel(im);
+    }
+    
 }

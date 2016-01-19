@@ -15,6 +15,8 @@
  */
 package org.sesync.consent.controllers.pages;
 
+import java.util.List;
+import org.sesync.consent.entities.ProjectApproval;
 import org.sesync.consent.model.InstanceFactory;
 import org.sesync.consent.model.InstanceModel;
 import org.slf4j.Logger;
@@ -24,7 +26,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Root controller to return /
@@ -43,7 +44,8 @@ public class Consent {
             @PathVariable("instance") String instance, 
             @PathVariable("uid") String uid) {
         InstanceModel im = instanceFactory.getInstance(instance);
+        List<ProjectApproval> l = im.getApprovalsForCode(uid);
         
-        return "admin";
+        return "appprove";
     }
 }

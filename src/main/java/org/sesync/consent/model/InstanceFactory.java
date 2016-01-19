@@ -5,9 +5,13 @@
  */
 package org.sesync.consent.model;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import org.sesync.consent.controllers.exceptions.InstanceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,13 +34,47 @@ public class InstanceFactory {
 
     private final Map<String, InstanceModel> instances = new HashMap<>();
 
+    private static final FileFilter configFilter = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.isDirectory() && pathname.canWrite();
+        }
+    };
+
+    /**
+     * Scan instance directory and create instances for each sub directory
+     */
     @PostConstruct
     private void loadConfigs() {
         LOG.debug("Loading instances from: " + configDir);
+        File dir = new File(configDir);
+        if (!dir.isDirectory()) {
+            throw new RuntimeException("Cannot load config directory " + configDir);
+        }
+        for (File f : dir.listFiles(configFilter)) {
+            LOG.debug("Loading instance: " + f.getName());
+            try {
+                InstanceModel im = InstanceModel.createInstance(f);
+                instances.put(im.getName(), im);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 
-    public InstanceModel getInstance(String instance) {
-        return instances.get(instance);
+    /**
+     * 
+     * @param instance instance to retrieve
+     * @return
+     * @throws InstanceNotFoundException if an instance w/ the supplied name wasn't found
+     */
+    public InstanceModel getInstance(String instance) throws InstanceNotFoundException {
+        if (instances.containsKey(instance)) {
+            return instances.get(instance);
+        } else {
+            throw new InstanceNotFoundException("Cannot load " + instance);
+        }
     }
 
 }

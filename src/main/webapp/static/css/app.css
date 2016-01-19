@@ -37,8 +37,8 @@ body {
     vertical-align: bottom;
 }
 
-.platform-main-content {
-    padding-top: 50px;
+.app-main-content {
+    padding-top: 75px;
 }
 
 .control-group {
@@ -57,67 +57,4 @@ body {
 
 .breadcrumb {
     background-color: #FFFFFF;
-}
-
-/* Front Page formatting */
-.frontpageheader {
-    width:100%;
-    height:350px;
-    background-image:url('../img/bridge.jpg');
-    background-size:cover;
-}
-
-.frontpageheader img {
-    width:100%;
-}
-.frontpageheader .maintitle {
-    color:#fff;
-    font-weight:800;
-    text-align:center;
-    text-shadow: 2px 2px #000;
-}
-@media (min-width: 768px) {
-    .frontpageheader {
-        height:350px;
-    }
-    .frontpageheader .maintitle {
-        font-size:57pt;
-        padding-top:100px;
-    }
-}
-
-@media all and (max-width: 768px ) {
-    .frontpageheader .maintitle {
-        font-size:36pt;
-        padding-top:50px;
-    }
-
-    .frontpageheader {
-        height:250px;
-    }
-}
-
-
-.frontpagesearch {
-    padding:25px;
-}
-
-/* Files Listing */
-
-.files td, .files th {
-    border: 1px solid;
-    padding: 1em;
-}
-
-/* Search page */
-.inline-list {
-	display: block;
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-}
-.inline-list li {
-	display: inline;
-	padding: 1em;
-	margin: 0;
 }
