@@ -1,0 +1,8 @@
+{ 
+  "title": "Consent Test Site", 
+  "mailFrom": "msmoruL@sesync.org", 
+  "mailSubject": "Test Send" ,
+  "projectDescription": "This is the description of the project, shown in the top part of the consent page",
+  "submissionComplete":"Danke",
+  "adminEmails": ["msmorul@sesync.org"]
+}

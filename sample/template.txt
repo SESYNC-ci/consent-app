@@ -1,0 +1,20 @@
+This is a test email
+
+Title: $config.title
+Mail From: $config.mailFrom
+Mail Subject: $config.mailSubject
+Description:
+$config.projectDescription
+
+Here's a link to follow for approval:
+$url
+
+
+#foreach ($p in $projects)
+  $p.project
+  $p.site
+  $p.email
+  $p.name
+
+
+#end
