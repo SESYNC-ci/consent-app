@@ -32,10 +32,12 @@ public class InstanceFactory {
 
     @Value("${configuration.dir}")
     private String configDir;
-    
+    @Value("${app.prefix}")
+    private String appUrl;
+
     @Autowired
     private MailService mailService;
-    
+
     private final Map<String, InstanceModel> instances = new HashMap<>();
 
     private static final FileFilter configFilter = new FileFilter() {
@@ -58,7 +60,7 @@ public class InstanceFactory {
         for (File f : dir.listFiles(configFilter)) {
             LOG.debug("Loading instance: " + f.getName());
             try {
-                InstanceModel im = InstanceModel.createInstance(f, mailService);
+                InstanceModel im = InstanceModel.createInstance(f, mailService, appUrl);
                 instances.put(im.getName(), im);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -68,10 +70,11 @@ public class InstanceFactory {
     }
 
     /**
-     * 
+     *
      * @param instance instance to retrieve
      * @return
-     * @throws InstanceNotFoundException if an instance w/ the supplied name wasn't found
+     * @throws InstanceNotFoundException if an instance w/ the supplied name
+     * wasn't found
      */
     public InstanceModel getInstance(String instance) throws InstanceNotFoundException {
         if (instances.containsKey(instance)) {

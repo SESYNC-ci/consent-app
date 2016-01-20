@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 public class MailService {
     @Value("${mail.server}")
     private String mailServer;
+    @Value("${app.prefix}")
+    private String appUrl;
     
     public void sendMail(InstanceModel im, List<ProjectApproval> approvals) throws EmailException{
         String messageBody = im.createMessageBody(approvals);
@@ -39,5 +41,16 @@ public class MailService {
             pa.setEmailSent(new Date());
         }
        
+    }
+    
+    public void sendAdminLink(InstanceModel im, String mailTo) throws EmailException {
+        Email email = new SimpleEmail();
+        String mailFrom = im.getConfig().getMailFrom();
+        email.setHostName(mailServer);
+        email.setFrom(mailFrom);
+        email.addTo(mailTo);
+        email.setSubject("Admin URL");
+        email.setMsg("\n\nAdmin Link: "+appUrl+"/"+im.getName()+"/admin/"+im.getInstanceKey()+"\n\n");
+        email.send();
     }
 }

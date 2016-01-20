@@ -63,11 +63,15 @@ public class InstanceModel {
     private InstanceConfig config;
     private List<ProjectApproval> approvals;
     private MailService mailService;
+    private String urlPrefix;
+    private String instanceKey;
 
-    private InstanceModel(File dir, MailService mailService) {
+    private InstanceModel(File dir, MailService mailService, String urlPrefix) {
 
         this.dir = dir;
         this.mailService = mailService;
+        this.urlPrefix = urlPrefix;
+        this.instanceKey = RandomStringUtils.randomAlphanumeric(25);
     }
 
     /**
@@ -78,9 +82,9 @@ public class InstanceModel {
      * @return new instance
      * @throws FileNotFoundException if any components are missing
      */
-    public static InstanceModel createInstance(File dir, MailService mailService) throws IOException {
+    public static InstanceModel createInstance(File dir, MailService mailService, String urlPrefix) throws IOException {
 
-        InstanceModel im = new InstanceModel(dir, mailService);
+        InstanceModel im = new InstanceModel(dir, mailService, urlPrefix);
 
         // load configuration
         im.config = mapper.readValue(new File(dir, configFileName), InstanceConfig.class);
@@ -170,6 +174,10 @@ public class InstanceModel {
         return config;
     }
 
+    public String getInstanceKey() {
+        return instanceKey;
+    }
+
     public List<ProjectApproval> getApprovalsForCode(String code) {
         List<ProjectApproval> l = new ArrayList<>();
         if (StringUtils.isBlank(code)) {
@@ -232,6 +240,7 @@ public class InstanceModel {
 
         context.put("projects", approvals);
         context.put("config", config);
+        context.put("url", urlPrefix + "/" + getName() + "/consent/" + approvals.get(0).getUrlCode());
         loadTemplate().merge(context, sw);
         return sw.toString();
     }
