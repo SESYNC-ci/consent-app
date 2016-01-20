@@ -15,6 +15,7 @@
  */
 package org.sesync.consent.controllers.pages;
 
+import java.util.Arrays;
 import java.util.List;
 import org.sesync.consent.entities.ProjectApproval;
 import org.sesync.consent.model.InstanceFactory;
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Root controller to return /
@@ -39,13 +42,38 @@ public class Consent {
     @Autowired
     private InstanceFactory instanceFactory;
     
+    
     @RequestMapping(value="/{instance}/consent/{uid}", method = RequestMethod.GET)
-    public String consentGet(
+    public ModelAndView consentGet(
             @PathVariable("instance") String instance, 
             @PathVariable("uid") String uid) {
         InstanceModel im = instanceFactory.getInstance(instance);
         List<ProjectApproval> l = im.getApprovalsForCode(uid);
+       
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("approve");
+        mav.addObject("im", im);
+        mav.addObject("projects",l);
         
-        return "appprove";
+        return mav;
     }
+    @RequestMapping(value="/{instance}/consent/{uid}", method = RequestMethod.POST) 
+    public ModelAndView sendApproval(@PathVariable("instance") String instance, @RequestParam("project") String[] projectList) {
+        InstanceModel im = instanceFactory.getInstance(instance);
+        List<ProjectApproval> approvals = im.getApprovalsForCode(instance);
+        Arrays.sort(projectList);
+        for (String project : projectList) {
+            LOG.info("Processing approval response submitted for: " + project);
+//            im.sendMailTo(code);
+            if (Arrays.binarySearch(projectList, project) >= 0) {
+                
+            }
+        }
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("thanks");
+        mav.addObject("im", im);        
+        return mav;
+    }
+    
 }

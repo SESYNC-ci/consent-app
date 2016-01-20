@@ -28,9 +28,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="item" items="${im.approvals}">
+                        <c:forEach var="item" varStatus="idx" items="${im.approvals}">
                             <tr>
-                                <td><input type="checkbox" value="${item.urlCode}" name="code"></td>
+                                <td><input type="checkbox" value="${idx.index}" name="code"></td>
                                 <td>${item.name}</td>
                                 <td>${item.email} </td>
                                 <td><c:choose><c:when test="${item.emailSent == null}">Not Sent</c:when><c:otherwise>${item.emailSent}</c:otherwise></c:choose></td>

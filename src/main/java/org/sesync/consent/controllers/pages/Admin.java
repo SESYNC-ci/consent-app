@@ -15,9 +15,12 @@
  */
 package org.sesync.consent.controllers.pages;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.mail.EmailException;
+import org.sesync.consent.controllers.exceptions.MailSendException;
+import org.sesync.consent.entities.ProjectApproval;
 import org.sesync.consent.model.InstanceFactory;
 import org.sesync.consent.model.InstanceModel;
 import org.slf4j.Logger;
@@ -37,37 +40,41 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class Admin {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(Admin.class);
-    
+
     @Autowired
     private InstanceFactory instanceFactory;
-    
+
     private ModelAndView getModel(InstanceModel im) {
-        
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("admin");
         mav.addObject("im", im);
         return mav;
     }
-    
+
     @RequestMapping(value = "/{instance}/admin", method = RequestMethod.GET)
     public ModelAndView adminGet(@PathVariable("instance") String instance) {
         InstanceModel im = instanceFactory.getInstance(instance);
         return getModel(im);
     }
-    
+
     @RequestMapping(value = "/{instance}/admin", method = RequestMethod.POST)
-    public ModelAndView sendMail(@PathVariable("instance") String instance, @RequestParam("code") String[] codeList) {
+    public ModelAndView sendMail(@PathVariable("instance") String instance, @RequestParam("code") int[] projectList) {
         InstanceModel im = instanceFactory.getInstance(instance);
-        Set<String> codes = new HashSet<>();
-        codes.addAll(Arrays.asList(codeList));
-        for (String code : codes) {
-            LOG.info("Sending to: " + code);
-            im.sendMailTo(code);
+        List<ProjectApproval> approvals = new ArrayList<>(projectList.length);
+        for (int idx : projectList) {
+            approvals.add(im.getApprovals().get(idx));
         }
-        
+        try {
+            LOG.debug("Sending {} requests", approvals.size());
+            im.sendMailTo(approvals);
+        } catch (EmailException | IOException e) {
+            throw new MailSendException(e);
+        }
+
         return getModel(im);
     }
-    
+
 }

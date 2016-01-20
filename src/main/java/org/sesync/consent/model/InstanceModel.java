@@ -15,12 +15,17 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.mail.EmailException;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -56,22 +61,25 @@ public class InstanceModel {
     private File dataFile;
     private InstanceConfig config;
     private List<ProjectApproval> approvals;
+    private MailService mailService;
     
-    private InstanceModel(File dir) {
+    private InstanceModel(File dir, MailService mailService) {
 
         this.dir = dir;
+        this.mailService = mailService;
     }
 
     /**
      * Create an instance for hte supplied directory.
      *
      * @param dir directory containing instance config and templates
+     * @param mailService autowired mail service
      * @return new instance
      * @throws FileNotFoundException if any components are missing
      */
-    public static InstanceModel createInstance(File dir) throws IOException {
+    public static InstanceModel createInstance(File dir, MailService mailService) throws IOException {
 
-        InstanceModel im = new InstanceModel(dir);
+        InstanceModel im = new InstanceModel(dir, mailService);
 
         // load configuration
         im.config = mapper.readValue(new File(dir, configFileName), InstanceConfig.class);
@@ -174,8 +182,33 @@ public class InstanceModel {
         return l;
     }
 
-    public void sendMailTo(String code) {
-        LOG.debug("Sending mail for " + code);
+    public void sendMailTo(List<ProjectApproval> approvals) throws IOException, EmailException{
+        Collections.sort(approvals, new Comparator<ProjectApproval>(){
+            @Override
+            public int compare(ProjectApproval o1, ProjectApproval o2) {
+                return o1.getEmail().compareTo(o2.getEmail());
+            }
+        });
+        
+        int prev = 0;
+        for (int i = 0; i < approvals.size(); i++) {
+            if (!approvals.get(i).getEmail().equals(approvals.get(prev).getEmail())) {
+                mailService.sendMail(this, approvals.subList(prev, i));
+                prev = i;
+            }
+        }
+        mailService.sendMail(this, approvals.subList(prev, approvals.size()));
+                
+        saveData();
+    }
+    
+    public void setResponse(ProjectApproval pa, boolean approved) throws IOException {
+        if (!approvals.contains(pa)) {
+            throw new IllegalArgumentException("Approval not in this model");
+        }
+        pa.setRespondedAt(new Date());
+        pa.setHasConsented(approved);
+        saveData();
     }
 
     public List<ProjectApproval> getApprovals() {
@@ -183,10 +216,14 @@ public class InstanceModel {
     }
     
     public String getTestMail() {
+        return createMessageBody(getApprovalsForCode(approvals.get(0).getUrlCode()));
+    }
+    
+    public String createMessageBody(List<ProjectApproval> approvals) {
         StringWriter sw = new StringWriter();
         Context context = new VelocityContext();
 
-        context.put("projects", getApprovalsForCode(approvals.get(0).getUrlCode()));
+        context.put("projects", approvals);
         context.put("config", config);
         loadTemplate().merge(context, sw);
         return sw.toString();

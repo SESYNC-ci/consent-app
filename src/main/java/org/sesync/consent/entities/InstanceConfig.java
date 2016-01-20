@@ -18,16 +18,23 @@ public class InstanceConfig {
     private String mailFrom = "";
     private String mailSubject = "";
     private String projectDescription = "";
+    private String submissionComplete = "";
 
     @JsonCreator
     public InstanceConfig(@JsonProperty("title") String title,
             @JsonProperty("mailFrom") String mailFrom,
             @JsonProperty("mailSubject") String mailSubject,
-            @JsonProperty("projectDescription") String projectDescription) {
+            @JsonProperty("projectDescription") String projectDescription,
+            @JsonProperty("submissionComplete") String submissionComplete) {
         this.title = title;
         this.mailFrom = mailFrom;
         this.mailSubject = mailSubject;
         this.projectDescription = projectDescription;
+        this.submissionComplete = submissionComplete;
+    }
+
+    public String getSubmissionComplete() {
+        return submissionComplete;
     }
 
     public String getProjectDescription() {

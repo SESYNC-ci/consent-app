@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 import org.sesync.consent.controllers.exceptions.InstanceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,10 @@ public class InstanceFactory {
 
     @Value("${configuration.dir}")
     private String configDir;
-
+    
+    @Autowired
+    private MailService mailService;
+    
     private final Map<String, InstanceModel> instances = new HashMap<>();
 
     private static final FileFilter configFilter = new FileFilter() {
@@ -54,7 +58,7 @@ public class InstanceFactory {
         for (File f : dir.listFiles(configFilter)) {
             LOG.debug("Loading instance: " + f.getName());
             try {
-                InstanceModel im = InstanceModel.createInstance(f);
+                InstanceModel im = InstanceModel.createInstance(f, mailService);
                 instances.put(im.getName(), im);
             } catch (IOException e) {
                 throw new RuntimeException(e);
