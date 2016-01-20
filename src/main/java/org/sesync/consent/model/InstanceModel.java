@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * @author National Socio-Environmental Synthesis Center
  */
 public class InstanceModel {
+
     private static final Logger LOG = LoggerFactory.getLogger(InstanceModel.class);
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -62,7 +63,7 @@ public class InstanceModel {
     private InstanceConfig config;
     private List<ProjectApproval> approvals;
     private MailService mailService;
-    
+
     private InstanceModel(File dir, MailService mailService) {
 
         this.dir = dir;
@@ -113,7 +114,7 @@ public class InstanceModel {
         ve.init();
         return ve.getTemplate(emailTemplateFileName);
     }
-    
+
     public void loadCsv() throws IOException {
         File csvFile = new File(dir, contactsFileName);
         Reader in = new FileReader(csvFile);
@@ -182,14 +183,14 @@ public class InstanceModel {
         return l;
     }
 
-    public void sendMailTo(List<ProjectApproval> approvals) throws IOException, EmailException{
-        Collections.sort(approvals, new Comparator<ProjectApproval>(){
+    public void sendMailTo(List<ProjectApproval> approvals) throws IOException, EmailException {
+        Collections.sort(approvals, new Comparator<ProjectApproval>() {
             @Override
             public int compare(ProjectApproval o1, ProjectApproval o2) {
                 return o1.getEmail().compareTo(o2.getEmail());
             }
         });
-        
+
         int prev = 0;
         for (int i = 0; i < approvals.size(); i++) {
             if (!approvals.get(i).getEmail().equals(approvals.get(prev).getEmail())) {
@@ -198,27 +199,33 @@ public class InstanceModel {
             }
         }
         mailService.sendMail(this, approvals.subList(prev, approvals.size()));
-                
+
         saveData();
     }
-    
-    public void setResponse(ProjectApproval pa, boolean approved) throws IOException {
+
+    public void setResponse(ProjectApproval pa, boolean approved) {
         if (!approvals.contains(pa)) {
             throw new IllegalArgumentException("Approval not in this model");
         }
+        LOG.info("Setting response for {} {} {}", pa.getEmail(), pa.getProject(), approved);
         pa.setRespondedAt(new Date());
         pa.setHasConsented(approved);
-        saveData();
+        pa.setHasResponded(true);
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("Error saving json file");
+        }
     }
 
     public List<ProjectApproval> getApprovals() {
         return Collections.unmodifiableList(approvals);
     }
-    
+
     public String getTestMail() {
         return createMessageBody(getApprovalsForCode(approvals.get(0).getUrlCode()));
     }
-    
+
     public String createMessageBody(List<ProjectApproval> approvals) {
         StringWriter sw = new StringWriter();
         Context context = new VelocityContext();

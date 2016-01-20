@@ -37,43 +37,46 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class Consent {
+
     private static final Logger LOG = LoggerFactory.getLogger(Consent.class);
 
     @Autowired
     private InstanceFactory instanceFactory;
-    
-    
-    @RequestMapping(value="/{instance}/consent/{uid}", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/{instance}/consent/{uid}", method = RequestMethod.GET)
     public ModelAndView consentGet(
-            @PathVariable("instance") String instance, 
+            @PathVariable("instance") String instance,
             @PathVariable("uid") String uid) {
         InstanceModel im = instanceFactory.getInstance(instance);
         List<ProjectApproval> l = im.getApprovalsForCode(uid);
-       
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("approve");
         mav.addObject("im", im);
-        mav.addObject("projects",l);
-        
+        mav.addObject("projects", l);
+
         return mav;
     }
-    @RequestMapping(value="/{instance}/consent/{uid}", method = RequestMethod.POST) 
-    public ModelAndView sendApproval(@PathVariable("instance") String instance, @RequestParam("project") String[] projectList) {
-        InstanceModel im = instanceFactory.getInstance(instance);
-        List<ProjectApproval> approvals = im.getApprovalsForCode(instance);
-        Arrays.sort(projectList);
-        for (String project : projectList) {
-            LOG.info("Processing approval response submitted for: " + project);
-//            im.sendMailTo(code);
-            if (Arrays.binarySearch(projectList, project) >= 0) {
-                
-            }
-        }
+
+    @RequestMapping(value = "/{instance}/consent/{uid}", method = RequestMethod.POST)
+    public ModelAndView receiveResponse(
+            @PathVariable("instance") String instance,
+            @PathVariable("uid") String uid,
+            @RequestParam(value = "project", required = false, defaultValue = "-1") int[] projectList) {
         
+        InstanceModel im = instanceFactory.getInstance(instance);
+        List<ProjectApproval> approvals = im.getApprovalsForCode(uid);
+
+        Arrays.sort(projectList);
+        LOG.info("approvals {} {}" , approvals.size(), Arrays.toString(projectList));
+        for (int i = 0; i < approvals.size(); i++) {
+            im.setResponse(approvals.get(i), Arrays.binarySearch(projectList, i) >= 0);
+        }
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("thanks");
-        mav.addObject("im", im);        
+        mav.addObject("im", im);
         return mav;
     }
-    
+
 }

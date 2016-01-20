@@ -16,8 +16,8 @@
         </div>
         <form method="POST">
             <ul>
-                <c:forEach var="item" items="${projects}">
-                    <li><input type="checkbox" value="${item.project}" name="project"> - ${item.project}, <a href="${item.site}">${item.site}</a></li>
+                <c:forEach var="item" varStatus="status" items="${projects}">
+                    <li><input type="checkbox" value="${status.index}" name="project"> - ${item.project}, <a href="${item.site}">${item.site}</a></li>
                 </c:forEach>
             </ul>
             <button type="submit" class="btn btn-success">Submit</button></div>
