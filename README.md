@@ -1,9 +1,9 @@
 # Installation
 
 * Edit src/main/resources/application.properties and customize the following for your site:
-** configuration.dir=/home/ranger/consent
-** mail.server=smtp.umiacs.umd.edu
-** app.prefix=http://researchtestbox.research.sesync.org:8080
+    * configuration.dir=/home/ranger/consent
+    * mail.server=smtp.umiacs.umd.edu
+    * app.prefix=http://researchtestbox.research.sesync.org:8080
 * mvn clean package
 * java -jar target/consent-app-1.0-SNAPSHOT.war -or- deploy to your favorite tomcat/jetty container.
 
@@ -23,10 +23,10 @@
 }
 </pre>
 * template.txt - The email template to send to people. The template is a velocity template and has the following variables available for use:
-** $projects - list of all projects this email address is attached to
-** $config - config object
-** $config.title - title of this project
-** $url - approval link for this user
+    * $projects - list of all projects this email address is attached to
+    * $config - config object
+    * $config.title - title of this project
+    * $url - approval link for this user
 * contacts.csv - your contacts file. It should contain the following columns with column headers
 <pre>
 "name","email","project","site"
