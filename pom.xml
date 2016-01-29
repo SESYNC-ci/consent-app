@@ -11,6 +11,9 @@
         <java.version>1.7</java.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <data.dir>~/data</data.dir>
+        <mail.host>localhost</mail.host>
+        <app.prefix>http://localhost:8084/consent-app</app.prefix>
     </properties>
     
     
@@ -44,16 +47,19 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
         </dependency>
+        <!-- csv parsing of contacts -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
             <version>1.1</version>
         </dependency>
+        <!-- email notification -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
             <version>1.4</version>
         </dependency>
+        <!-- exe jar -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
@@ -63,6 +69,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
         </dependency>
+        <!-- templating for email -->
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-tools</artifactId>
@@ -76,6 +83,13 @@
     </dependencies>
 
     <build>
+        <!-- profile for application.properties -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -91,6 +105,48 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <data.dir>/data</data.dir>
+                <app.prefix>http://localhost:8080</app.prefix>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.3.258</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <imageName>consent-app</imageName>
+                            <baseImage>java</baseImage>
+                            <exposes>
+                                <expose>8080</expose>
+                            </exposes>
+                            <entryPoint>["java", "-jar", "/${project.build.finalName}.war"]</entryPoint>
+                            <!-- copy the service's jar file from target into the root directory of the image --> 
+                            <resources>
+                                <resource>
+                                    <targetPath>/</targetPath>
+                                    <directory>${project.build.directory}</directory>
+                                    <include>${project.build.finalName}.war</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <repositories>
         <repository>
