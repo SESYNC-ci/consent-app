@@ -61,7 +61,7 @@ public class Admin {
 
     @RequestMapping(value = "/{instance}/admin", method = RequestMethod.GET)
     public String askAdmin(@PathVariable("instance") String instance) {
-
+        instanceFactory.getInstance(instance);
         return "askemail";
     }
 
