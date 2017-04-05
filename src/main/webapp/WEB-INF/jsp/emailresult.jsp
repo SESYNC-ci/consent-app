@@ -10,7 +10,7 @@
         </div>
         <div class="row ">
             <div class="col-lg-12">
-                <p>Please check your email for a link to access the admin site.</p>
+                <p>${message}</p>
             </div>
         </div>
     </jsp:body>

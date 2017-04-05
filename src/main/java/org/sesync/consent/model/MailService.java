@@ -5,6 +5,7 @@
  */
 package org.sesync.consent.model;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.mail.Email;
@@ -25,7 +26,7 @@ public class MailService {
     @Value("${app.prefix}")
     private String appUrl;
     
-    public void sendMail(InstanceModel im, List<ProjectApproval> approvals) throws EmailException{
+    public void sendMail(InstanceModel im, List<ProjectApproval> approvals) throws EmailException,IOException{
         String messageBody = im.createMessageBody(approvals);
         String subject = im.getConfig().getMailSubject();
         String mailFrom = im.getConfig().getMailFrom();

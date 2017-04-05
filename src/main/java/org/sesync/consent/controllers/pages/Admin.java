@@ -51,35 +51,37 @@ public class Admin {
     @Autowired
     private MailService mailService;
 
-    private ModelAndView getModel(InstanceModel im) {
+    private ModelAndView getModel(String view, InstanceModel im) {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("admin");
+        mav.setViewName(view);
         mav.addObject("im", im);
         return mav;
     }
 
     @RequestMapping(value = "/{instance}/admin", method = RequestMethod.GET)
-    public String askAdmin(@PathVariable("instance") String instance) {
-        instanceFactory.getInstance(instance);
-        return "askemail";
+    public ModelAndView askAdmin(@PathVariable("instance") String instance) {
+        return getModel("askemail", instanceFactory.getInstance(instance));
     }
 
     @RequestMapping(value = "/{instance}/admin", method = RequestMethod.POST)
-    public String sendEmail(@PathVariable("instance") String instance,
+    public ModelAndView sendEmail(@PathVariable("instance") String instance,
             @RequestParam("email") String email) {
-
+        String message = "";
         InstanceModel im = instanceFactory.getInstance(instance);
         for (String e : im.getConfig().getAdminEmails()) {
             if (e.equals(email)) {
                 try {
+                    LOG.debug("Sending admin link to " + email);
                     mailService.sendAdminLink(im, email);
+                    message = "Please check your email for a link to access the admin site.";
                 } catch (EmailException ex) {
-                    LOG.equals(ex); // silently log to avoid spilling info
+                    message = "Error Sending link, please check server logs";
+                    LOG.error("Error sending to " + email, ex);
                 }
             }
         }
-        return "emailresult";
+        return getModel("emailresult", im).addObject("message", message);
     }
 
     @RequestMapping(value = "/{instance}/admin/{key}", method = RequestMethod.GET)
@@ -89,7 +91,7 @@ public class Admin {
 
         InstanceModel im = instanceFactory.getInstance(instance);
         if (key.equals(im.getInstanceKey())) {
-            return getModel(im);
+            return getModel("admin", im);
         } else {
             RedirectView rv = new RedirectView("admin/..");
             rv.setStatusCode(HttpStatus.FOUND);
@@ -123,7 +125,7 @@ public class Admin {
             throw new MailSendException(e);
         }
 
-        return getModel(im);
+        return getModel("admin", im);
     }
 
 }

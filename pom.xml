@@ -6,12 +6,12 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <properties>
-        <spring-release>1.2.1.RELEASE</spring-release>
+        <spring-release>1.5.2.RELEASE</spring-release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.7</java.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <data.dir>~/data</data.dir>
+        <data.dir>.</data.dir>
         <mail.host>localhost</mail.host>
         <app.prefix>http://localhost:8084/consent-app</app.prefix>
     </properties>
@@ -43,6 +43,7 @@
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- servlet rendering -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
@@ -51,7 +52,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>1.1</version>
+            <version>1.4</version>
         </dependency>
         <!-- email notification -->
         <dependency>
@@ -74,6 +75,13 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-tools</artifactId>
             <version>2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -117,7 +125,7 @@
                     <plugin>
                         <groupId>com.spotify</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.3.258</version>
+                        <version>0.4.13</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>

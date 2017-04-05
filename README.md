@@ -19,6 +19,7 @@ $ docker run -p8080:8080 -v /my/data/dir:/data [image id]
 1. Create a directory to hold your instance. This directory will be used to name the url path for your instance. 
 2. Create the following files or copy them from the sample directory here:
 * config.json
+    * additionalFields - these will appear on the approval page and are available in case you want to ask additional questions.
 <pre>
 { 
   "title": "Consent Test Site", 
@@ -27,6 +28,9 @@ $ docker run -p8080:8080 -v /my/data/dir:/data [image id]
   "projectDescription": "This is the text that will appear on the website. It can contain html and links"
   "submissionComplete":"Thanks for responding",
   "adminEmails": ["yourmail@something.com","otheradmin@gmail.com"]
+  "additionalFields": {
+      "Field 1":"Placeholder text/optional"
+      }
 }
 </pre>
 * template.txt - The email template to send to people. The template is a velocity template and has the following variables available for use:

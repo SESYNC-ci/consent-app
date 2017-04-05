@@ -17,9 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -79,6 +77,7 @@ public class InstanceModel {
      *
      * @param dir directory containing instance config and templates
      * @param mailService autowired mail service
+     * @param urlPrefix
      * @return new instance
      * @throws FileNotFoundException if any components are missing
      */
@@ -87,7 +86,12 @@ public class InstanceModel {
         InstanceModel im = new InstanceModel(dir, mailService, urlPrefix);
 
         // load configuration
-        im.config = mapper.readValue(new File(dir, configFileName), InstanceConfig.class);
+        File cfgFile = new File(dir, configFileName);
+        if (!cfgFile.isFile()) {
+            LOG.info("Cannot load config in directory " + dir);
+            return null;
+        }
+        im.config = mapper.readValue(cfgFile, InstanceConfig.class);
 
         // load or create data file
         im.dataFile = new File(dir, dataFileName);
@@ -112,11 +116,15 @@ public class InstanceModel {
         mapper.writeValue(dataFile, approvals);
     }
 
-    private Template loadTemplate() {
+    private Template loadTemplate() throws IOException {
         VelocityEngine ve = new VelocityEngine();
         ve.setProperty(VelocityEngine.FILE_RESOURCE_LOADER_PATH, dir.getAbsolutePath());
-        ve.init();
-        return ve.getTemplate(emailTemplateFileName);
+        try {
+            ve.init();
+            return ve.getTemplate(emailTemplateFileName);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     public void loadCsv() throws IOException {
@@ -211,13 +219,12 @@ public class InstanceModel {
         saveData();
     }
 
-    public void setResponse(ProjectApproval pa, boolean approved) {
+    public void setResponse(ProjectApproval pa) {
         if (!approvals.contains(pa)) {
             throw new IllegalArgumentException("Approval not in this model");
         }
-        LOG.info("Setting response for {} {} {}", pa.getEmail(), pa.getProject(), approved);
+        LOG.info("Setting response for {} {} {}", pa.getEmail(), pa.getProject(), pa.isHasConsented());
         pa.setRespondedAt(new Date());
-        pa.setHasConsented(approved);
         pa.setHasResponded(true);
         try {
             saveData();
@@ -230,11 +237,11 @@ public class InstanceModel {
         return Collections.unmodifiableList(approvals);
     }
 
-    public String getTestMail() {
+    public String getTestMail() throws IOException {
         return createMessageBody(getApprovalsForCode(approvals.get(0).getUrlCode()));
     }
 
-    public String createMessageBody(List<ProjectApproval> approvals) {
+    public String createMessageBody(List<ProjectApproval> approvals) throws IOException {
         StringWriter sw = new StringWriter();
         Context context = new VelocityContext();
 
