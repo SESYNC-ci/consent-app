@@ -61,7 +61,10 @@ public class InstanceFactory {
             LOG.debug("Loading instance: " + f.getName());
             try {
                 InstanceModel im = InstanceModel.createInstance(f, mailService, appUrl);
-                instances.put(im.getName(), im);
+                if (im != null) {
+                    LOG.info("Registering instance: " + f.getName());
+                    instances.put(im.getName(), im);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

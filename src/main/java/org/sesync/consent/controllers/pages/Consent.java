@@ -17,6 +17,7 @@ package org.sesync.consent.controllers.pages;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.sesync.consent.entities.ProjectApproval;
 import org.sesync.consent.model.InstanceFactory;
 import org.sesync.consent.model.InstanceModel;
@@ -62,21 +63,38 @@ public class Consent {
     public ModelAndView receiveResponse(
             @PathVariable("instance") String instance,
             @PathVariable("uid") String uid,
-            @RequestParam(value = "project", required = false, defaultValue = "-1") int[] projectList) {
-        
+            @RequestParam(value = "project", required = false, defaultValue = "-1") int[] projectList,
+            @RequestParam() Map<String, String> otherparams) {
+
         InstanceModel im = instanceFactory.getInstance(instance);
         List<ProjectApproval> approvals = im.getApprovalsForCode(uid);
 
         Arrays.sort(projectList);
-        LOG.info("approvals {} {}" , approvals.size(), Arrays.toString(projectList));
+        LOG.info("approvals {} {}", approvals.size(), Arrays.toString(projectList));
         for (int i = 0; i < approvals.size(); i++) {
-            im.setResponse(approvals.get(i), Arrays.binarySearch(projectList, i) >= 0);
-        }
 
+            ProjectApproval pa = approvals.get(i);
+            pa.setHasConsented(Arrays.binarySearch(projectList, i) >= 0);
+            // Additional form parameters are encoded:
+            // index_FieldName
+            pa.getAdditionalFields().clear();
+            // Loop through all additional configured fields and test to see if its contained in this
+            // form for this particular approval.
+            for (String fieldName : im.getConfig().getAdditionalFields().keySet()) {
+                String formField = i + "_" + fieldName;
+                LOG.trace("Testing key formField: {}",formField);
+                if (otherparams.containsKey(formField)) {
+                    LOG.trace("Setting field '{}' val: '{}'",fieldName, otherparams.get(formField));
+                    pa.getAdditionalFields().put(fieldName, otherparams.get(formField));
+                }
+
+            }
+            im.setResponse(pa);
+        }
         ModelAndView mav = new ModelAndView();
         mav.setViewName("thanks");
         mav.addObject("im", im);
         return mav;
-    }
 
+    }
 }

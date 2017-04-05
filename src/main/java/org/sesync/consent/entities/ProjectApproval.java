@@ -6,6 +6,8 @@
 package org.sesync.consent.entities;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -21,6 +23,15 @@ public class ProjectApproval {
     private boolean hasConsented = false;
     private Date respondedAt;
     private boolean hasResponded = false;
+    private Map<String,String> additionalFields = new HashMap<>();
+
+    public Map<String, String> getAdditionalFields() {
+        return additionalFields;
+    }
+
+    public void setAdditionalFields(Map<String, String> additionalFields) {
+        this.additionalFields = additionalFields;
+    }
 
     public void setUrlCode(String urlCode) {
         this.urlCode = urlCode;

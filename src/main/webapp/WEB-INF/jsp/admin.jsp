@@ -20,11 +20,11 @@
                             <th></th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th></th>
+                            <th>Contacted</th>
                             <th>Project</th>
                             <th>Site</th>
                             <th>Status</th>
-
+                            <c:forEach items="${im.config.additionalFields}" var="field"><th>${field.key}</th></c:forEach>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,6 +44,7 @@
                                         <c:otherwise>Not Responded</c:otherwise>
                                     </c:choose>
                                 </td>
+                                <c:forEach items="${im.config.additionalFields}" var="field"><td>${item.additionalFields[field.key]}</td></c:forEach>
 
                             </tr>
                         </c:forEach>
