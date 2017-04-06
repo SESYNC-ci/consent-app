@@ -22,6 +22,7 @@ public class InstanceConfig {
     private String mailFrom = "";
     private String mailSubject = "";
     private String projectDescription = "";
+    private String projectDescriptionBottom = "";
     private String submissionComplete = "";
     private String[] adminEmails = new String[0];
     private Map<String,String> additionalFields = new HashMap<>();
@@ -31,6 +32,7 @@ public class InstanceConfig {
             @JsonProperty("mailFrom") String mailFrom,
             @JsonProperty("mailSubject") String mailSubject,
             @JsonProperty("projectDescription") String projectDescription,
+            @JsonProperty("projectDescriptionBottom") String projectDescriptionBottom,
             @JsonProperty("submissionComplete") String submissionComplete,
             @JsonProperty("adminEmails") String[] adminEmails,
             @JsonProperty("additionalFields") Map<String,String> additionalFields) {
@@ -57,6 +59,10 @@ public class InstanceConfig {
 
     public String getProjectDescription() {
         return projectDescription;
+    }
+
+    public String getProjectDescriptionBottom() {
+        return projectDescriptionBottom;
     }
 
     public String getMailFrom() {

@@ -33,6 +33,9 @@
                 </div>
             </form>
         </div>
+        <div class="row ">
+            <p>${im.config.projectDescriptionBottom}</p>
+        </div>
     </jsp:body>
 
 </t:bootstrapbase>
