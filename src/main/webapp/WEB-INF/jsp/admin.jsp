@@ -50,7 +50,7 @@
                         </c:forEach>
                     </tbody>
                 </table></div>
-            <div class="row"><button type="submit" class="btn btn-success">Send Emails</button></div>
+                        <div class="row"><button type="submit" class="btn btn-success">Send Emails</button><a href="${im.instanceKey}/results.csv">Download Results</a></div>
         </form>
     </jsp:body>
 

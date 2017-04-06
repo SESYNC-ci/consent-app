@@ -51,10 +51,10 @@ public class InstanceModel {
     public static final String emailTemplateFileName = "template.txt";
     public static final String configFileName = "config.json";
     // headers to look for in csv file
-    private static final String EMAIL_HDR = "email";
-    private static final String PROJECT_HDR = "project";
-    private static final String NAME_HDR = "name";
-    private static final String SITE_HDR = "site";
+    public static final String EMAIL_HDR = "email";
+    public static final String PROJECT_HDR = "project";
+    public static final String NAME_HDR = "name";
+    public static final String SITE_HDR = "site";
 
     private final File dir;
     private File dataFile;
