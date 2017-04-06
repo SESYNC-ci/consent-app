@@ -22,8 +22,8 @@
                             <li><input type="checkbox" value="${status.index}" name="project"> - ${item.project}  <a href="${item.site}">${item.site}</a>
                                 <c:forEach var="field" items="${im.config.additionalFields}">
                                     <div class="form-group">
-                                        <label for="${status.index}_${field.key}">${field.key}</label>
-                                        <input type="text" class="form-control" id="${status.index}_${field.key}" name="${status.index}_${field.key}" placeholder="${field.value}">
+                                        <label for="${status.index}_${field.key}">${field.value}</label>
+                                        <input type="text" class="form-control" id="${status.index}_${field.key}" name="${status.index}_${field.key}">
                                     </div>
                                 </c:forEach>
                             </li>
