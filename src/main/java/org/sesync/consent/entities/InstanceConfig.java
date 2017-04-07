@@ -40,6 +40,7 @@ public class InstanceConfig {
         this.mailFrom = mailFrom;
         this.mailSubject = mailSubject;
         this.projectDescription = projectDescription;
+        this.projectDescriptionBottom = projectDescriptionBottom;
         this.submissionComplete = submissionComplete;
         this.adminEmails = adminEmails;
         this.additionalFields = Collections.unmodifiableMap(additionalFields);
